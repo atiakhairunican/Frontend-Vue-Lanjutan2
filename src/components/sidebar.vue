@@ -1,6 +1,6 @@
 <template>
     <div class="container-fluid">
-        <aside class="sidebar">
+        <!-- <aside class="sidebar">
             <h3>Cart <span>0</span></h3>
             <div class="container-sidebar" v->
                 <div class="img">
@@ -9,7 +9,7 @@
                 <h4>Your cart is empty</h4>
                 <p>Please add some items from the menu</p>
             </div>
-        </aside>
+        </aside> -->
     </div>
 </template>
 
@@ -20,7 +20,7 @@ export default {
 </script>
 
 <style scoped>
-    .sidebar {
+    /* .sidebar {
         width: 25%;
         right: 0;
         top: 0;
@@ -102,5 +102,5 @@ export default {
         .sidebar h3 {
             padding: 7.2vw;
         }
-    }
+    } */
 </style>

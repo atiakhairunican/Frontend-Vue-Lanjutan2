@@ -1,50 +1,168 @@
 <template>
     <div class="container-fluit">
+<!-- --------------------------------------------------Header-------------------------------------------------- -->
         <header>
             <div class="container-head">
-                <select class="dropdown" v-model="selected" @click="orderBy()">
-                    <option disabled>Order By</option>
-                    <option>Name</option>
-                    <option>Price</option>
-                    <option>Category</option>
-                </select>
                 <h3>Food Items</h3>
                 <div class="search">
-                    <form action="#">
-                        <input id="search" type="text" placeholder="Search" v-model="getSearch">
-                        <label for="search">
-                            <div class="img">
-                                <img src="../assets/magnifying-glass.png" alt="Icon">
-                            </div>
-                        </label>
-                        <div class="clear"></div>
-                    </form>
+                    <div class="menu-malasngoding">
+                        <ul>
+                            <li class="dropdown"><a href="#">{{sortby}}</a>
+                                <ul class="isi-dropdown">
+                                    <li @click="sortName()"><a href="#">Name</a></li>
+                                    <li @click="sortPrice()"><a href="#">Price</a></li>
+                                    <li @click="sortCategory()"><a href="#">Category</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                    <input id="search" type="text" placeholder="Search" v-model="getSearch">
+                    <label for="search">
+                    </label>
+                    <div class="clear"></div>
                 </div>
                 <div class="clear"></div>
             </div>
         </header>
 
+<!-- ---------------------------------------------------Main--------------------------------------------------- -->
         <main>
             <aside>
                 <Menu/>
             </aside>
+<!-- --------------------------------------------------Payment-------------------------------------------------- -->
+            <div class="container-popup" v-if="showPop == true">
+                <div class="popup">
+                    <h2 style="float: left; font-size: 22px">Checkout</h2>
+                    <h4 style="float: right; font-size: 14px">Receipt no: #010410919</h4>
+                    <div class="clear"></div>
+                    <p style="margin-bottom: 20px; font-size: 13px">Cashier : {{form.cashier}}</p>
+                    <ul v-for="list in chart" :key="list.id_product">
+                        <li>{{list.name_product}} {{count}}x</li>
+                        <div class="right">
+                            <span class="rp">Rp. </span>
+                            <span class="res">{{list.price_product * count}}</span>
+                        </div>
+                        <div class="clear"></div>
+                    </ul>
+                    <p style="float: left; font-size: 14px">Ppn 10%</p>
+                    <div class="right">
+                        <span class="rp">Rp. </span>
+                        <span class="res">{{ppn}}</span>
+                    </div>
+                    <div class="clear"></div>
+                    
+                    <div class="payment" style="bottom: 70px">
+                        <p style="float: left; margin-top: 20px; font-size: 14px">Total :</p>
+                        <div class="right" style="margin-top: 20px">
+                            <div>
+                                <span class="rp">Rp. </span>
+                                <span class="res">{{amounted}}</span>
+                            </div>
+                        </div>
+                        <div class="clear"></div>
+
+                        <p style="margin-bottom: 20px; font-size: 14px">Payment : Cash</p>
+                        <button class="checkout" @click="clear()">Print</button>
+                        <p style="text-align: center; margin: -15px 0 -5px 0">Or</p>
+                        <button class="cancel" @click="history()">Send Email</button>
+                    </div>
+
+                </div>
+            </div>
+
+<!-- -------------------------------------------Cart in layout small------------------------------------------- -->
+            <div class="overlayImg" @click="showUpCart()">
+                <p>{{chart.length * count}}</p>
+                <div class="img">
+                    <img src="../assets/cart.png" alt="Cart">
+                </div>
+            </div>
+            <div class="container-overlayside" v-show="showCart">
+                <aside class="overlayside">
+                    <div class="x" @click="showDownCart()">x</div>
+                    <h3>Cart <span>{{chart.length * count}}</span></h3>
+                    <div class="container-sidebar" v-show="show || chart.length == 0">
+                        <div class="img">
+                            <img src="../assets/food-and-restaurant.png" alt="Icon">
+                        </div>
+                        <h4>Your cart is empty</h4>
+                        <p>Please add some items from the menu</p>
+                    </div>
+                    <div v-if="chart.length > 0" class="pay" v-show="!show">
+                        <div class="container-thumb">
+                            <div v-for="thumb in chart" :key="thumb.id_product">
+                                <div>
+                                    <Thumb
+                                        :images = "thumb.image_product"
+                                        :name = "thumb.name_product"
+                                        :price = "Number(thumb.price_product) * count"
+                                    />
+                                </div>
+                                <div class="addThumb">
+                                    <p class="minus" @click = "minusProd">-</p>
+                                    <p class="count">{{ count }}</p>
+                                    <p class="plus" @click = "plusProd">+</p>
+                                </div>
+                            </div>
+                            <div v-if="chart.length > 0" class="x" @click = "delChart()">x</div>
+                        </div>
+                        <div class="payment">
+                            <div style="width: 275px">
+                                <p class="total" style="float: left">Total: </p>
+                                <p class="total" style="float: right">Rp. {{calculated}}*</p>
+                            </div>
+                            <div class="clear"></div>
+                            <p class="ppn">*Belum termasuk ppn</p>
+                            <button class="checkout" @click="showPopup()">Checkout</button>
+                            <button class="cancel" @click="clear()">Cancel</button>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+            
+<!-- -------------------------------------------Cart in layout large------------------------------------------- -->
             <aside class="sidebar">
-                <h3>Cart <span>0</span></h3>
-                <div class="container-sidebar" v-show="show">
+                <h3>Cart <span>{{chart.length * count}}</span></h3>
+                <div class="container-sidebar" v-show="show || chart.length == 0">
                     <div class="img">
                         <img src="../assets/food-and-restaurant.png" alt="Icon">
                     </div>
                     <h4>Your cart is empty</h4>
                     <p>Please add some items from the menu</p>
                 </div>
-                <div class="pay" v-show="!show">
-                    <p class="total">Total: Rp. {{calculated}}*</p>
-                    <p class="ppn">*Belum termasuk ppn</p>
-                    <button class="checkout" @click="showPopup()">Checkout</button>
-                    <button class="cancel" @click="clear()">Cancel</button>
+                <div v-if="chart.length > 0" class="pay" v-show="!show">
+                    <div class="container-thumb">
+                        <div v-for="thumb in chart" :key="thumb.id_product">
+                            <div>
+                                <Thumb
+                                    :images = "thumb.image_product"
+                                    :name = "thumb.name_product"
+                                    :price = "Number(thumb.price_product) * count"
+                                />
+                            </div>
+                            <div class="addThumb">
+                                <p class="minus" @click = "minusProd">-</p>
+                                <p class="count">{{ count }}</p>
+                                <p class="plus" @click = "plusProd">+</p>
+                            </div>
+                        </div>
+                        <div v-if="chart.length > 0" class="x" @click = "delChart()">x</div>
+                    </div>
+                    <div class="payment">
+                        <div style="width: 275px">
+                            <p class="total" style="float: left">Total: </p>
+                            <p class="total" style="float: right">Rp. {{calculated}}*</p>
+                        </div>
+                        <div class="clear"></div>
+                        <p class="ppn">*Belum termasuk ppn</p>
+                        <button class="checkout" @click="showPopup()">Checkout</button>
+                        <button class="cancel" @click="clear()">Cancel</button>
+                    </div>
                 </div>
             </aside>
 
+<!-- -------------------------------------------------Card Main------------------------------------------------ -->
             <section>
                 <div class="container-main">
                     <div class="main">
@@ -54,30 +172,26 @@
                             || Number(getSearch) >= card.price_product" 
                             @click="addChart(card)"
                             >
+                            <div class="card">
                                 <Card
                                     :images = "card.image_product"
                                     :name = "card.name_product"
                                     :price = "Number(card.price_product)"
-                                    :Data = "card"
                                 />
                             </div>
-                            <!-- <button class="del" @click="clearChart()">Del</button> -->
+                            </div>
                         </div>
                     </div>
                 </div>
             </section>
         </main>
-
-        <div class="overlayPopup" v-show="!showPop" @click="hidePopup()">
-            <Popup/>
-        </div>
     </div>
 </template>
 
 <script>
 import Card from '../components/card'
 import Menu from '../components/menu'
-import Popup from '../components/popup'
+import Thumb from '../components/thumb'
 import axios from 'axios'
 
 export default {
@@ -85,7 +199,7 @@ export default {
     components : {
         Card,
         Menu,
-        Popup,
+        Thumb
     },
     data() {
         return {
@@ -93,106 +207,161 @@ export default {
             getSearch : "",
             chart : [],
             show : true,
-            showPop : true,
-            selected: "",
-            options: [
-                { text: 'Name', value: 'name_product' },
-                { text: 'Price', value: 'price_product' },
-                { text: 'Category', value: 'id_category' }
-            ]
+            showOverlay : false,
+            showPop : false,
+            showCart : false,
+            sortby : "Sort BY",
+            count : 1,
+            form : {
+                cashier : "#atiacan",
+                date : "",
+                orders : "",
+                amount : 0
+            }
         }
     },
     methods : {
-        addChart(value) {
-            this.chart.push(value)
-            this.show = false
+        history() {
+            this.form.cashier = "#atiacan"
+            let date = new Date()
+            let months = ["January", "Febuary", "March", "April", "May", "June", "July", "August",
+            "September", "October", "November", "December"]
+            this.form.date = date.getDate() + " " + months[date.getMonth()] + " " + date.getFullYear()
+            let order = []
+            this.chart.forEach((value) => {
+                order.push(value.name_product);
+            });
+
+            this.form.orders = order.join(", ").toString()
+            this.form.amount = this.amounted
+            
+            let getHistory = {
+                invoice : this.form.invoice,
+                cashier : this.form.cashier,
+                date : this.form.date,
+                orders : this.form.orders,
+                amount : this.form.amount
+            }
+            
+            axios({
+                method : "post",
+                url : "http://localhost:9000/history",
+                headers : {
+                    "Content-type" : "application/json"
+                },
+                data : getHistory
+            })
+            .then((res) => {
+                alert(res.data.description);
+                location.reload()
+            }).catch((err) => {
+                console.log(err)
+            });
         },
-        // toDetail(data) {
-        //     // berpindah halaman + passing data
-        //     this.$router.push({ path: "/detail", params: { data: data } })
-        // },
+        sortName() {
+            this.sorby = "Name"
+            axios.get(`http://localhost:9000/product/search/ordered?orderBy=name_product&order=ASC`)
+                        .then((res) => {
+                            this.datas = res.data.result;
+                        }).catch((err) => {
+                            console.log(err)
+                        });
+        },
+        sortPrice() {
+            this.sorby = "Price"
+            axios.get(`http://localhost:9000/product/search/ordered?orderBy=price_product&order=ASC`)
+                        .then((res) => {
+                            this.datas = res.data.result;
+                        }).catch((err) => {
+                            console.log(err)
+                        });
+        },
+        sortCategory() {
+            this.sorby = "Category"
+            axios.get(`http://localhost:9000/product/search/ordered?orderBy=id_category&order=ASC`)
+                        .then((res) => {
+                            this.datas = res.data.result;
+                        }).catch((err) => {
+                            console.log(err)
+                        });
+        },
+        addChart(value) {
+            let hasil = this.chart.find((res) => {
+            if (res.name_product == value.name_product) {
+                return res.name_product;
+                }
+            });
+            if (hasil) {
+                for (let i = 0; i < this.chart.length; i++) {
+                    if (this.chart[i].name_product == value.name_product) {
+                        this.chart[i].count++;
+                    }
+                }
+            } else {
+                value.count = 1;
+                this.show = false
+                this.showOverlay = false
+                if (this.chart.length <= 6) {
+                    this.chart.push(value);
+                }
+            }
+        },
+        minusProd() {
+            if (this.count > 1) {
+                this.count = this.count - 1
+            }
+            else {
+                this.count = 1
+            }
+        },
+        plusProd() {
+            this.count = this.count + 1
+        },
         showPopup() {
-            this.showPop = false
+            this.showPop = true
         },
         hidePopup() {
             this.showPop = true
         },
-        clearChart() {
+        delChart() {
             this.chart.pop()
         },
         clear() {
             this.chart = []
             this.show = true
-            this.showPop = true
+            this.showPop = false
         },
-        sortBy() {
-            let getName = this.datas.map( item => item.name_product)
-            console.log(getName)
+        showUpCart() {
+            this.showCart = true
         },
-        addData(value) {
-            axios({
-                method: "post",
-                url: process.env.VUE_APP_API,
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                data: {
-                    name: value.name_product,
-                    image: value.image_product,
-                    price: value.price_product,
-                    category: value.id_category
-                },
-            })
-        },
-        orderBy(value) {
-            axios.get(`http://localhost:9000/product/search/ordered?orderBy=${value}&order=ASC`)
-            .then((res) => {
-                this.datas = res.data.result;
-                console.log(this.datas)
-            }).catch((err) => {
-                console.log(err)
-            });
+        showDownCart() {
+            this.showCart = false
         }
-        // addData() {
-        //     // let getData = {
-        //     //     name : this.name,
-        //     //     image : this.image,
-        //     //     price : this.price,
-        //     //     category : this.category
-        //     // }
-        //     axios({
-        //         methods : "post",
-        //         url : "http://localhost:9000/product/",
-        //         headers : {
-        //             "Content-type" : "application/json"
-        //         },
-        //         data : {
-        //             name : this.name_product,
-        //             image : this.image_product,
-        //             price : this.price_product,
-        //             category : this.id_category
-        //         }
-        //     })
-        //     .then((res) => {
-        //         console.log(res.data)
-        //     }).catch((err) => {
-        //         console.log(err)
-        //     });
+        // toDetail(data) {
+        //     // berpindah halaman + passing data
+        //     this.$router.push({ path: "/", params: { data: data } })
         // },
     },
     computed : {
         calculated() {
-            let count = 0
+            let counts = 0
             for (const data of this.chart) {
-                count += Number(data.price_product)
+                counts += Number(data.price_product) * this.count
             }
-            return count
-        }
+            return counts
+        },
+        amounted() {
+            let totalpayment = this.calculated + (this.calculated * (10/100))
+            return totalpayment
+        },
+        ppn() {
+            let ppn = this.calculated * (10/100)
+            return ppn
+        },
     },
     mounted() {
         axios.get("http://localhost:9000/product/")
         .then((res) => {
-            // this.datas = res.data.result
             const dataSet = JSON.stringify(res.data.result)
             localStorage.setItem("data", dataSet)
         }).catch((err) => {
@@ -204,140 +373,242 @@ export default {
 </script>
 
 <style scoped>
-    .dropdown {
-        width: 15%;
-        position: absolute;
-    }
+/* --------------------------------------------------Header-------------------------------------------------- */
     .container-head {
-        width: 71%;
         height: 60px;
         position: fixed;
-        background-color: aliceblue;
-        left: 60px;
+        left: 0;
         line-height: 60px;
-        z-index: 1;
+        z-index: 3;
+        right: 0;
+        padding: 0 330px 0 80px;
+        background-color: rgb(222, 75, 81);
     }
     .container-head h3 {
-        width: 70%;
         float: left;
         font-size: 24px;
         text-align: center;
+        background-color: rgb(222, 75, 81);
+        color: aliceblue;
+        margin-left: 0;
+        margin-right: 0;
     }
     .search {
         line-height: 60px;
         justify-content: center;
-        margin-right: 10px;
+        background-color: rgb(222, 75, 81);
+        width: 250px;
+        float: right;
     }
     .search input {
         float: left;
-        width: 15%;
+        width: 150px;
+        height: 25px;
         border: none;
         border-bottom: 1px solid #ddd;
         color: #333;
         background-color: aliceblue;
         margin-top: 18px;
         font-size: 14px;
+        padding: 0 16px;
     }
     .search input:focus {
         outline: none;
     }
     .search .img img {
         width: 22px;
-        margin: 16px 0 0 10px;
+        margin: 20px 0 0 -25px;
+    }
+    
+    .menu-malasngoding{
+        float: left;
+        font-size: 14px;
+	}
+	.menu-malasngoding ul {
+		list-style-type: none;
+		overflow: hidden;
+	}
+	.menu-malasngoding li a {
+		display: inline-block;
+		color: white;
+		text-align: center;
+        width: 85px;
+		text-decoration: none;
+	}
+	li.dropdown {
+		display: inline-block;
+	}
+	.dropdown:hover .isi-dropdown {
+		display: block;
+	}
+	.isi-dropdown a:hover {
+		color: #fff !important;
+	}
+	.isi-dropdown {
+		position: absolute;
+		display: none;
+		box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+		z-index: 1;
+		background-color: #f9f9f9;
+	}
+	.isi-dropdown a {
+		color: #3c3c3c !important;
+        width: 80px;
+	}
+	.isi-dropdown a:hover {
+		color: #232323 !important;
+		background: #f3f3f3 !important;
+	}
+
+/* --------------------------------------------------Payment------------------------------------------------- */
+    .container-popup, .container-overlayside {
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: rgba(0, 0, 0, .5);
+        position: fixed;
+        z-index: 6;
+    }
+    .popup {
+        width: 410px;
+        background-color: white;
+        margin: auto;
+        height: 580px;
+        margin-top: 40px;
+        padding: 25px;
+        border-radius: 10px;
+        background-color: white;
+        font-weight: bold;
+        line-height: 32px;
+        border: 2px solid rgb(66, 175, 243);
+    }
+    .popup ul li {
+        float: left;
+        font-size: 14px;
+    }
+    .popup .right {
+        float: right;
+        width: 80px;
+        font-size: 14px;
+    }
+    .popup .rp {
+        display: block;
+        width: 25px;
+        float: left;
+    }
+    .popup .res {
+        display: block;
+        text-align: right;
+        float: right;
+    }
+    .checkout {
+        background-color:  rgb(255, 64, 89);
+    }
+    .cancel {
+        background-color: rgb(66, 175, 243);
+    }
+    button {
+        width: 350px;
+        padding: 8px;
+        border: none;
+        margin-bottom: 10px;
+        border-radius: 5px;
+        color: white;
+        font-size: 14px;
     }
 
+/* ---------------------------------------------------Main--------------------------------------------------- */
     .container-main {
-        width: 71%;
         height: 100%;
         background-color: #ececec;
-        left: 60px;
-        top: 60px;
-        padding-right: .5vw;
-        padding-top: 1.5vw;
-        /* padding: 2vw 0 2vw 2vw; */
-        box-shadow: inset .1vw .1vw .7vw 0 rgba(0, 0, 0, .1);
+        left: 0;
+        right: 0;
+        padding: 60px 330px 0 60px;
         position: relative;
     }
     .main {
         width: 100%;
         height: 100%;
-        /* background-color: darkgoldenrod; */
+        padding-top: 10px;
         display: flex;
         flex-direction: row;
         flex-wrap: wrap;
-        align: center;
         justify-content: center;
+        box-shadow: inset .1vw .1vw .7vw 0 rgba(0, 0, 0, .1);
     }
 
+/* ---------------------------------------------------Cart--------------------------------------------------- */
     .sidebar {
-        width: 25%;
+        z-index: 4;
+    }
+    .sidebar, .overlayside {
+        width: 330px;
         right: 0;
         top: 0;
         position: fixed;
-        position: fixed;
-        z-index: 2;
         height: 100%;
-        background-color: white;
+        background-color: aliceblue;
         box-shadow: 0 .1vw .5vw 0 rgba(0, 0, 0, .1);
     }
-    .sidebar h3, .sidebar h4, .sidebar .img {
+    .sidebar h3, .sidebar h4, .sidebar .img, .overlayside h3, .overlayside h4, .overlayside .img {
         width: 100%;
         font-weight: bold;
     }
-    .sidebar h3 {
+    .sidebar h3, .overlayside h3 {
         font-size: 24px;
         text-align: center;
         line-height: 60px;
-        background-color: white;
-        border-bottom: .2vw solid rgba(0, 0, 0, .1);
+        background-color: aliceblue;
+        border-bottom: 2px solid rgba(0, 0, 0, .1);
     }
-    .sidebar h4 {
-        font-size: 1.7vw;
+    .sidebar h4, .overlayside h4 {
+        font-size: 22px;
         text-align: center;
     }
-    .sidebar .img {
-        margin-top: 2vw;
+    .sidebar .img, .overlayside .img {
+        margin-top: 30px;
         text-align: center;
     }
-    .sidebar .img img {
+    .sidebar .img img, .overlayside .img img {
         width: 50%;
     }
-    .sidebar span {
-        width: 2vw;
-        height: 2vw;
-        padding: 0 .5vw;
+    .sidebar span, .overlayside span {
+        padding: 0 5px;
         border-radius: 50%;
         background-color: cyan;
         color: white;
+        text-align: center;
     }
     .container-sidebar p {
         color: #ccc;
         text-align: center;
-        margin-top: .5vw;
+        margin-top: 10px;
+        font-size: 13px;
     }
     .pay {
-        margin-top: 32vw;
         margin-left: 10%;
-        /* background-color: cyan; */
     }
     .pay p {
-        padding: .5vw;
-        margin-left: .5vw;
+        padding: 5px;
+        margin-left: 6px;
+        font-size: 13px;
     }
     .pay button {
-        width: 90%;
-        margin-left: 5%;
+        width: 100%;
         border: none;
-        padding: .5vw;
-        margin-bottom: .5vw;
+        padding: 5px;
+        margin-bottom: 5px;
         border-radius: 5px;
         color: white;
     }
     .ppn {
-        font-size: .9vw;
+        font-size: 14px;
     }
     .total {
         font-weight: bold;
+        margin-top: 20px;
+        font-size: 14px;
     }
     .cancel {
         background-color: rgb(255, 64, 89);
@@ -345,34 +616,100 @@ export default {
     .checkout {
         background-color: rgb(66, 175, 243);
     }
+    .payment {
+        position: absolute;
+        bottom: 10px;
+    }
+    .clear {
+        clear: both;
+    }
+    
+    .addThumb {
+        position: relative;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        text-align: center;
+        line-height: 8px;
+        margin: -30px 0 0 64px;
+    }
+    .minus, .count, .plus {
+        width: 20px;
+        height: 20px;
+        color: rgb(88, 248, 82);
+        border: 1px solid rgb(119, 255, 119);
+    }
+    .minus, .plus {
+        background-color: rgb(212, 255, 195);
+        cursor: pointer;
+    }
+    .x {
+        width: 20px;
+        height: 20px;
+        font-size: 16px;
+        color:white;
+        text-align: center;
+        line-height: 20px;
+        cursor: pointer;
+        margin-top: 5px;
+        background-color: rgb(222, 75, 81);
+    }
 
-    @media (max-width: 1000px) {
-        .container-main {
-            padding-right: 2vw;
-        }
+    .overlayImg {
+        display: none;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        position: fixed;
+        z-index: 6;
+        right: 0;
+        margin: 50px 20px 0 0;
+        cursor: pointer;
+        background-color: cyan;
+        box-shadow: 3px 3px 10px 0 rgba(0, 0, 0, .3);
     }
-    @media (max-width: 900px) {
-        .container-main {
-            padding-right: 3vw;
-        }
-        .dropdown {
-            margin-top: 2vw;
-        }
+    .overlayImg .img {
+        border-radius: 50%;
+        width: 90%;
+        margin-left: 12px;
     }
-    @media (max-width: 700px) {
-        .search input {
-            width: 10%;
-        }
+    .overlayImg img {
+        margin-top: 16px;
+        width: 50%;
     }
-    @media (max-width: 600px) {
-        .dropdown {
-            margin-top: 3vw;
+    .overlayImg p {
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        text-align: center;
+        line-height: 20px;
+        font-weight: bold;
+        border-radius: 50%;
+        color: white;
+        display: block;
+        right: 5px;
+        font-size: 16px;
+        background-color: red;
+    }
+    .overlayside {
+        position: fixed;
+        z-index: 5;
+    }
+
+/* ------------------------------------------------Media Query----------------------------------------------- */
+    @media (max-width: 800px) {
+        .sidebar {
+            display: none;
         }
         .container-main {
-            padding-right: 5vw;
+        padding: 60px 50px 0 60px;
         }
-        .search input {
-            font-size: 12px;
+        
+        .container-head {
+            padding: 0 60px 0 80px;
+        }
+        .overlayImg {
+            display: block;
         }
     }
 </style>

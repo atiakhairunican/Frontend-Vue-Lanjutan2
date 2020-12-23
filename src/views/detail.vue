@@ -1,14 +1,14 @@
 <template>
     <div class="container-fluid">
-        <div class="card">
+        <!-- <div class="card">
             <div class="pic">
                 <img :src="data.image" :alt="data.name">
             </div>
             <div class="content">
-                <p>{{ data.name }}</p>
+                <p class="name">{{ data.name }}</p>
                 <p class="price">Rp. {{ data.price }}</p>
             </div>
-        </div>
+        </div> -->
     </div>
 </template>
 

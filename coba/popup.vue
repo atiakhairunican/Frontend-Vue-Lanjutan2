@@ -1,6 +1,6 @@
 <template>
     <div class="container-fluid">
-        <div class="container-popup">
+        <!-- <div class="container-popup">
             <div class="popup">
                 <h2>Checkout</h2>
                 <p>Cashier :</p>
@@ -16,7 +16,7 @@
                 <p style="text-align: center; margin: -.7vw 0">Or</p>
                 <button class="cancel">Send Email</button>
             </div>
-        </div>
+        </div> -->
     </div>
 </template>
 
@@ -27,7 +27,7 @@ export default {
 </script>
 
 <style scoped>
-    .container-popup {
+    /* .container-popup {
         top: 0;
         bottom: 0;
         left: 0;
@@ -66,8 +66,6 @@ export default {
         margin-bottom: .5vw;
         border-radius: 5px;
         color: white;
-    }
-    .cancel:focus, .checkout:focus {
-        outline: none;
-    }
+        
+    } */
 </style>

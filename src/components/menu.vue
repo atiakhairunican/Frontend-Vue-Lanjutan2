@@ -29,6 +29,16 @@
                             <img src="../assets/add.png" alt="Add">
                         </div>
                     </li>
+                    <li>
+                        <div class="img" @click="showUpdate()">
+                            <img src="../assets/edit.png" alt="Add">
+                        </div>
+                    </li>
+                    <li>
+                        <div class="img" @click="showDelete()">
+                            <img src="../assets/delete.png" alt="Add">
+                        </div>
+                    </li>
                 </ul>
             </div>
         </aside>
@@ -70,6 +80,71 @@
                 </div>
             </div>
         </div>
+
+        <div class="overlayAdd" v-show="showDel">
+            <div class="containerDel">
+                <h2>Delete Item</h2>
+                <div>
+                    <label for="name">Name</label>
+                    <input
+                        type="text"
+                        id="nameDel"
+                        v-model="nameForDel"
+                        required
+                    >
+                    <div class="btn">
+                        <button class="checkout" @click="hideDel()">Cancel</button>
+                        <button class="cancel" @click="delData()">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="overlayAdd" v-show="showUp">
+            <div class="containerUp">
+                <h2>Update Item</h2>
+                <div>
+                    <label for="name">Old Name</label>
+                    <input
+                        type="text"
+                        id="oldName"
+                        v-model="formup.old_name_product"
+                        required
+                    ><br>
+                    <label for="name">Name</label>
+                    <input
+                        type="text"
+                        id="nameUp"
+                        v-model="formup.name_product"
+                        required
+                    ><br>
+                    <label for="image">Image</label>
+                    <input
+                        type="text"
+                        id="imageUp"
+                        v-model="formup.image_product"
+                        required
+                    ><br>
+                    <label for="price">Price</label>
+                    <input
+                        type="number"
+                        id="priceUp"
+                        v-model="formup.price_product"
+                        required
+                    ><br>
+                    <label >Category</label>
+                    <select name="category" v-model="formup.id_category" required>
+                        <option value="Category" disabled>Category</option>
+                        <option value="1">Food</option>
+                        <option value="2">Drink</option>
+                    </select>
+                    <div class="btn">
+                        <button class="checkout" @click="hideUp()">Cancel</button>
+                        <button class="cancel" @click="updateData()">Update</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 	</div>
 </template>
 
@@ -81,8 +156,18 @@ export default {
     data() {
         return {
             show : false,
+            showDel : false,
+            showUp : false,
             updateSubmit: false,
+            nameForDel : "",
             form : {
+                name_product : "",
+                image_product : "",
+                price_product : 0,
+                id_category : null,
+            },
+            formup : {
+                old_name_product : "",
                 name_product : "",
                 image_product : "",
                 price_product : 0,
@@ -91,13 +176,26 @@ export default {
         }
     },
     methods : {
-
         showAdd() {
-            this.$router.push({name : "home"}).catch((err) => {console.log(err)})
+            // this.$router.push({name : "home"}).catch((err) => {console.log(err)})
             this.show = true
+        },
+        showDelete() {
+            // this.$router.push({name : "home"}).catch((err) => {console.log(err)})
+            this.showDel = true
+        },
+        showUpdate() {
+            // this.$router.push({name : "home"}).catch((err) => {console.log(err)})
+            this.showUp = true
         },
         hideAdd() {
             this.show = false
+        },
+        hideDel() {
+            this.showDel = false
+        },
+        hideUp() {
+            this.showUp = false
         },
         addData() {
             let getData = {
@@ -110,14 +208,50 @@ export default {
             
             axios({
                 method : "post",
-                url : "http://localhost:9000/product/",
+                url : process.env.VUE_APP_URL + "product",
                 headers : {
                     "Content-type" : "application/json"
                 },
                 data : getData
             })
             .then((res) => {
-                console.log(res.data)
+                alert(res.data.description);
+                location.reload()
+            }).catch((err) => {
+                console.log(err)
+            });
+        },
+        delData() {
+            let name = this.nameForDel
+            axios.delete(`http://localhost:9000/product/del?name=${name}`)
+                        .then((res) => {
+                            alert(res.data.description);
+                            location.reload()
+                        }).catch((err) => {
+                            console.log(err)
+                        });
+        },
+        updateData() {
+            let updateData = {
+                oldName : this.formup.old_name_product,
+                name : this.formup.name_product,
+                image : this.formup.image_product,
+                price : this.formup.price_product,
+                idCategory : this.formup.id_category
+            }
+            console.log(updateData)
+            
+            axios({
+                method : "put",
+                url : process.env.VUE_APP_URL + "product",
+                headers : {
+                    "Content-type" : "application/json"
+                },
+                data : updateData
+            })
+            .then((res) => {
+                alert(res.data.description);
+                location.reload()
             }).catch((err) => {
                 console.log(err)
             });
@@ -132,7 +266,7 @@ export default {
         width: 60px;
         position: fixed;
         top: 0;
-        z-index: 1;
+        z-index: 4;
         height: 100%;
         background-color: aliceblue;
     }
@@ -142,6 +276,7 @@ export default {
     .container-menu .img {
         width: 100%;
         margin-bottom: 8vh;
+        cursor: pointer;
     }
     .menu-bar .img img {
         width: 80%;
@@ -157,65 +292,95 @@ export default {
         right: 0;
         background-color: rgba(0, 0, 0, .5);
         position: fixed;
-        z-index: 3;
+        z-index: 5;
     }
     .containerAdd {
-        width: 30%;
+        width: 350px;
         background-color: white;
         margin: auto;
-        height: 70%;
-        margin-top: 7%;
-        padding: 2vw;
+        height: 400px;
+        margin-top: 100px;
+        padding: 20px;
         border-radius: 10px;
         background-color: white;
         font-weight: bold;
-        line-height: 2.5vw;
+        line-height: 18px;
         border: 2px solid rgb(66, 175, 243);
     }
-    .containerAdd h2 {
-        margin-bottom: 2vw;
+    .containerAdd h2, .containerDel h2, .containerUp h2 {
+        font-size: 22px;
+        margin-bottom: 25px;
     }
-    .containerAdd input, select {
-        margin: 0 .5vw 0 1.5vw;
-        width: 70%;
+    .containerAdd input, select, .containerDel input, .containerUp input {
+        width: 210px;
         border: none;
         border-bottom: 1px solid #ddd;
         color: #333;
-        padding: .5vw 1vw;
+        padding: 5px 15px;
         background-color: aliceblue;
-        margin: 1vw;
+        margin: 14px;
         box-shadow: 0 .1vw .5vw 0 rgba(0, 0, 0, .2);
     }
-    .containerAdd input {
+    .containerAdd input, .containerDel input, .containerUp input {
         font-size: 14px;
     }
-    .containerAdd input:focus, select:focus {
+    .containerAdd input:focus, select:focus, .containerDel input:focus, .containerUp input:focus {
         outline: none;
     }
-    .containerAdd label {
+    .containerAdd label, .containerDel label, .containerUp label {
         width: 20%;
+        font-size: 14px;
         display: inline-block;
     }
-    .containerAdd button {
-        width: 25%;
-        margin-right: 3%;
+    .containerAdd button, .containerDel button, .containerUp button {
+        width: 90px;
+        margin-right: 10px;
         border: none;
-        padding: .5vw;
-        margin-bottom: .5vw;
+        padding: 7px;
+        /* margin-bottom: .5vw; */
         border-radius: 5px;
         color: white;
     }
+    .containerDel {
+        width: 350px;
+        background-color: white;
+        margin: auto;
+        height: 230px;
+        margin-top: 100px;
+        padding: 20px;
+        border-radius: 10px;
+        background-color: white;
+        font-weight: bold;
+        line-height: 18px;
+        border: 2px solid rgb(66, 175, 243);
+    }
+    .containerUp {
+        width: 350px;
+        background-color: white;
+        margin: auto;
+        height: 450px;
+        margin-top: 100px;
+        padding: 20px;
+        border-radius: 10px;
+        background-color: white;
+        font-weight: bold;
+        line-height: 18px;
+        border: 2px solid rgb(66, 175, 243);
+    }
     .btn {
         width: 100%;
-        margin: 6vw 0 5% 12vw;
+        margin: 15px;
+        margin: 50px 0 30px 100px;
     }
     .cancel {
         background-color: rgb(255, 64, 89);
+        cursor: pointer;
     }
     .cancel:focus, .checkout:focus {
         outline: none;
     }
     .checkout {
         background-color: rgb(66, 175, 243);
+        cursor: pointer;
     }
 </style>

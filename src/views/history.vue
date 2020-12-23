@@ -11,8 +11,8 @@
                 <Menu/>
             </aside>
 
-            <section>
-                <div class="container-main">
+            <section class="container-main">
+                <div class="main">
                     <div class="income">
                         <div class="todaysIncome">
                             <p>Today's Income</p>
@@ -48,7 +48,22 @@
                     </div>
                     <div class="revenue">
                         <h1>Revenue</h1>
-                        <button class="month">Month</button>
+                        <!-- <button class="month">Month</button> -->
+                        <select name="month" id="month">
+                            <option value="month" disabled>Month</option>
+                            <option value="jan">January</option>
+                            <option value="feb">Febuary</option>
+                            <option value="mar">March</option>
+                            <option value="apr">April</option>
+                            <option value="may">May</option>
+                            <option value="jun">June</option>
+                            <option value="jul">July</option>
+                            <option value="aug">August</option>
+                            <option value="sep">September</option>
+                            <option value="oct">October</option>
+                            <option value="nov">November</option>
+                            <option value="dec">December</option>
+                        </select>
                         <div class="clear"></div>
                         <p class="x">50k</p><hr><div class="clear"></div>
                         <p class="x">40k</p><hr><div class="clear"></div>
@@ -71,62 +86,118 @@
                         <button class="month">Today</button>
                         <div class="clear"></div>
                         <div class="recent">
-                            <ul>
-                                <li>INVOICE</li>
-                                <li>CHASIER</li>
-                                <li>DATE</li>
-                                <li>ORDERS</li>
-                                <li>AMOUNT</li>
-                            </ul>
-                            <hr>
-                            <ul class="table">
-                                <li>#10928</li>
-                                <li>Chasier 1</li>
-                                <li>06 October 2019</li>
-                                <li style="text-align: left;">Espresso, Wiener Schnitzer</li>
-                                <li>Rp. 70.000</li>
-                            </ul>
+                            <table border="1" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th width="10%">INVOICE</th>
+                                        <th width="10%">CASHIER</th>
+                                        <th width="15%">DATE</th>
+                                        <th width="50%">ORDERS</th>
+                                        <th width="15%">AMOUNT</th>
+                                    </tr>
+                                </thead>
+                                <tbody v-for="order in datas" :key="order.id">
+                                    <tr>
+                                        <td>#{{maketextnumber(3)}}</td>
+                                        <td>{{order.cashier}}</td>
+                                        <td>{{order.date}}</td>
+                                        <td>{{order.orders}}</td>
+                                        <td>Rp. {{order.amount}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
             </section>
         </main>
-
+        
         
     </div>
 </template>
 
 <script>
 import Menu from '../components/menu'
+import axios from 'axios'
 
     export default {
         name : "history",
         components : {
             Menu,
         },
+        data() {
+            return {
+                datas : JSON.parse(localStorage.getItem("dataHistory"))
+            }
+        },
+        methods: {
+            maketextnumber(n) {
+                let randomtextnumber = ""
+                for (let r = ["A", "B", "C", "D", "E", "F", "G", "H", "I",  "J", "K", "L",
+                            "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
+                            "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"],
+                            e = n, t = new Array, a = 0; a <= e - 1; a++)
+                            {
+                                t[a] = r[parseInt(Math.random() * r.length)];
+                                let nt = t;
+                                randomtextnumber += nt.join("")
+                            }
+                return randomtextnumber
+            }
+        },
+        mounted() {
+            axios.get("http://localhost:9000/history/")
+            .then((res) => {
+                const dataSet = JSON.stringify(res.data.result)
+                localStorage.setItem("dataHistory", dataSet)
+            }).catch((err) => {
+                console.log(err)
+                this.$router.push({ path: "/" })
+            });
+    },
     }
 </script>
 
 <style scoped>
-    .container-head {
-        width: 95%;
-        position: fixed;
-        background-color: aliceblue;
-        left: 5%;
-        padding: 1.3vw 0;
-        border-bottom: .1vw solid rgba(75, 75, 75, 0.1);
-        z-index: 1;
-    }
-    .container-head h3 {
-        font-size: 2vw;
+    table {
+        width: 100%;
         text-align: center;
     }
+    th {
+        padding: 5px;
+        background-color: rgb(39, 223, 225);
+    }
+    td {
+        padding: 3px 10px;
+    }
+    .container-head {
+        height: 60px;
+        position: fixed;
+        left: 0;
+        line-height: 60px;
+        z-index: 3;
+        right: 0;
+        padding: 0 20px 0 80px;
+        background-color: aliceblue;
+    }
+    .container-head h3 {
+        font-size: 24px;
+        text-align: center;
+        color: black;
+    }
     .container-main {
-        width: 95%;
         height: 100%;
-        padding: 5% 0 0 3%;
-        margin-left: 5%;
-        box-shadow: inset .1vw 0 .7vw 0 rgba(0, 0, 0, .1);
+        background-color: aliceblue;
+        left: 0;
+        right: 0;
+        padding: 60px 0 0 60px;
+        position: relative;
+    }
+    .main {
+        width: 100%;
+        height: 100%;
+        padding: 20px;
+        box-shadow: inset .1vw .1vw .7vw 0 rgba(0, 0, 0, .1);
     }
     .income {
         width: 100%;
@@ -181,6 +252,7 @@ import Menu from '../components/menu'
         margin: 4vw 1vw 1vw 1vw;
         box-shadow: .5vw .5vw .6vw .4vw rgba(0, 0, 0, .15);
         padding: 3vw;
+        background-color: #eaeaea;
     }
     .revenue h1 {
         float: left;
@@ -188,6 +260,10 @@ import Menu from '../components/menu'
     }
     .revenue button {
         float: right;
+    }
+    .revenue select {
+        float: right;
+        cursor: pointer;
     }
     .inform {
         width: 17%;
@@ -197,7 +273,7 @@ import Menu from '../components/menu'
     }
     .inform .this, .last {
         display: inline-block;
-        float: left;
+        /* float: left; */
         width: .8vw;
         height: .8vw;
         background-color: cyan;
@@ -215,8 +291,9 @@ import Menu from '../components/menu'
     .inform .last {
         background-color: lightpink;
     }
-    .month {
-        font-size: 1vw;
+    #month {
+        font-size: 12px;
+        width: 100px;
     }
     .diagram {
         width: 100%;
@@ -231,6 +308,7 @@ import Menu from '../components/menu'
         color: #ccc;
         font-weight: bold;
         float: left;
+        font-size: 14px;
     }
     hr {
         border: 0;

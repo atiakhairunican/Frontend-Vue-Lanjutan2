@@ -1,18 +1,18 @@
 <template>
     <div class="container-fluit">
-        <div class="main-card">
-            <div class="card"  @click="show = true">
+        <div class="main-card" @click="show = true">
+            <div class="card">
                 <div class="pic">
                     <img :src="images" :alt="name">
                 </div>
                 <div class="content">
-                    <p>{{ name }}</p>
+                    <p class="name">{{ name }}</p>
                     <p class="price">Rp. {{ price }}</p>
                 </div>
             </div>
-            <div class="overlay" v-show="show" @click="show = false">
+            <!-- <div class="overlay" v-show="show" @click="show = false">
                 <b-icon icon="check-circle"></b-icon>
-            </div>
+            </div> -->
         </div>
     </div>
 </template>
@@ -41,24 +41,26 @@ export default {
         return {
             show : false
         }
-    },
-    // methods : {
-    //     goDetail() {
-    //         console.log(this.Data)
-    //         this.$router.push({ name: "detail", params: { data: this.Data } })
-    //     },
-    // }
+    }
 }
 </script>
 
 <style scoped>
     .card {
-        background-color: darkkhaki;
+        width: 250px;
+        height: 260px;
+        background-color: rgb(217, 168, 86);
+        /* background-color: darkkhaki; */
         border-top-left-radius: 10px;
         border-top-right-radius: 10px;
         box-shadow: 0 .1vw .5vw 0 rgba(0, 0, 0, .1);
         margin: 1.47vw;
         position: relative;
+        cursor: pointer;
+    }
+    .pic img {
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
     }
     .content {
         padding: 5px 14px;
@@ -72,13 +74,13 @@ export default {
     }
     .overlay {
         position: absolute;
-        width: 26.2%;
+        width: 250px;
+        height: 260px;
         z-index: 2;
-        height: 19.1vw;
         margin: -20.5vw 0 0 1.45vw;
         background-color: rgba(0, 0, 0, .3);
         text-align: center;
-        line-height: 19.1vw;
+        line-height: 260px;
         border-top-left-radius: 10px;
         border-top-right-radius: 10px;
     }
