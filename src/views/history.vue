@@ -146,7 +146,7 @@ import axios from 'axios'
             }
         },
         mounted() {
-            axios.get("http://localhost:9000/history/")
+            axios.get("http://54.175.48.28/histories/")
             .then((res) => {
                 const dataSet = JSON.stringify(res.data.result)
                 localStorage.setItem("dataHistory", dataSet)

@@ -245,7 +245,7 @@ export default {
             
             axios({
                 method : "post",
-                url : "http://localhost:9000/history",
+                url : "http://54.175.48.28/histories",
                 headers : {
                     "Content-type" : "application/json"
                 },
@@ -260,7 +260,7 @@ export default {
         },
         sortName() {
             this.sorby = "Name"
-            axios.get(`http://localhost:9000/product/search/ordered?orderBy=name_product&order=ASC`)
+            axios.get(`http://54.175.48.28/products/search/ordered?orderBy=name_product&order=ASC`)
                         .then((res) => {
                             this.datas = res.data.result;
                         }).catch((err) => {
@@ -269,7 +269,7 @@ export default {
         },
         sortPrice() {
             this.sorby = "Price"
-            axios.get(`http://localhost:9000/product/search/ordered?orderBy=price_product&order=ASC`)
+            axios.get(`http://54.175.48.28/products/search/ordered?orderBy=price_product&order=ASC`)
                         .then((res) => {
                             this.datas = res.data.result;
                         }).catch((err) => {
@@ -278,7 +278,7 @@ export default {
         },
         sortCategory() {
             this.sorby = "Category"
-            axios.get(`http://localhost:9000/product/search/ordered?orderBy=id_category&order=ASC`)
+            axios.get(`http://54.175.48.28/products/search/ordered?orderBy=id_category&order=ASC`)
                         .then((res) => {
                             this.datas = res.data.result;
                         }).catch((err) => {
@@ -360,7 +360,7 @@ export default {
         },
     },
     mounted() {
-        axios.get("http://localhost:9000/product/")
+        axios.get("http://54.175.48.28/products/")
         .then((res) => {
             const dataSet = JSON.stringify(res.data.result)
             localStorage.setItem("data", dataSet)
