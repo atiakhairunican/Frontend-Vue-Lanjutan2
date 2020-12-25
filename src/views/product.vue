@@ -245,7 +245,7 @@ export default {
             
             axios({
                 method : "post",
-                url : "http://54.175.48.28/histories",
+                url : "127.0.0.1:9000/history",
                 headers : {
                     "Content-type" : "application/json"
                 },
