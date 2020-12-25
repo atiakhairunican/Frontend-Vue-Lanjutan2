@@ -208,7 +208,7 @@ export default {
             
             axios({
                 method : "post",
-                url : process.env.VUE_APP_URL + "product",
+                url : process.env.VUE_APP_URL + "products",
                 headers : {
                     "Content-type" : "application/json"
                 },
@@ -223,7 +223,7 @@ export default {
         },
         delData() {
             let name = this.nameForDel
-            axios.delete(`http://localhost:9000/product/del?name=${name}`)
+            axios.delete(`http://54.175.48.28/products/del?name=${name}`)
                         .then((res) => {
                             alert(res.data.description);
                             location.reload()
@@ -243,7 +243,7 @@ export default {
             
             axios({
                 method : "put",
-                url : process.env.VUE_APP_URL + "product",
+                url : process.env.VUE_APP_URL + "products",
                 headers : {
                     "Content-type" : "application/json"
                 },
