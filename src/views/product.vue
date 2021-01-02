@@ -80,7 +80,7 @@
             </div>
             <div class="container-overlayside" v-show="showCart">
                 <aside class="overlayside">
-                    <div class="x" @click="showDownCart()">x</div>
+                    <div class="xSmall" @click="showDownCart()">x</div>
                     <h3>Cart <span>{{chart.length * count}}</span></h3>
                     <div class="container-sidebar" v-show="show || chart.length == 0">
                         <div class="img">
@@ -204,6 +204,7 @@ export default {
     data() {
         return {
             datas : JSON.parse(localStorage.getItem("data")),
+            dataRole : localStorage.getItem("access_role"),
             getSearch : "",
             chart : [],
             show : true,
@@ -245,7 +246,7 @@ export default {
             
             axios({
                 method : "post",
-                url : "http://54.175.48.28/histories",
+                url : process.env.VUE_APP_URL + "history",
                 headers : {
                     "Content-type" : "application/json"
                 },
@@ -260,30 +261,48 @@ export default {
         },
         sortName() {
             this.sorby = "Name"
-            axios.get(`http://54.175.48.28/products/search/ordered?orderBy=name_product&order=ASC`)
-                        .then((res) => {
-                            this.datas = res.data.result;
-                        }).catch((err) => {
-                            console.log(err)
-                        });
+            axios({
+                method : "get",
+                url : `${process.env.VUE_APP_URL}product/search/ordered?orderBy=name_product&order=ASC`,
+                headers : {
+                    authtoken: localStorage.getItem("access_token"),
+                },
+            })
+            .then((res) => {
+                this.datas = res.data.result;
+            }).catch((err) => {
+                console.log(err)
+            });
         },
         sortPrice() {
             this.sorby = "Price"
-            axios.get(`http://54.175.48.28/products/search/ordered?orderBy=price_product&order=ASC`)
-                        .then((res) => {
-                            this.datas = res.data.result;
-                        }).catch((err) => {
-                            console.log(err)
-                        });
+            axios({
+                method : "get",
+                url : `${process.env.VUE_APP_URL}product/search/ordered?orderBy=price_product&order=ASC`,
+                headers : {
+                    authtoken: localStorage.getItem("access_token"),
+                },
+            })
+            .then((res) => {
+                this.datas = res.data.result;
+            }).catch((err) => {
+                console.log(err)
+            });
         },
         sortCategory() {
             this.sorby = "Category"
-            axios.get(`http://54.175.48.28/products/search/ordered?orderBy=id_category&order=ASC`)
-                        .then((res) => {
-                            this.datas = res.data.result;
-                        }).catch((err) => {
-                            console.log(err)
-                        });
+            axios({
+                method : "get",
+                url : `${process.env.VUE_APP_URL}product/search/ordered?orderBy=id_category&order=ASC`,
+                headers : {
+                    authtoken: localStorage.getItem("access_token"),
+                },
+            })
+            .then((res) => {
+                this.datas = res.data.result;
+            }).catch((err) => {
+                console.log(err)
+            });
         },
         addChart(value) {
             let hasil = this.chart.find((res) => {
@@ -319,6 +338,7 @@ export default {
         },
         showPopup() {
             this.showPop = true
+            this.showCart = false
         },
         hidePopup() {
             this.showPop = true
@@ -360,14 +380,20 @@ export default {
         },
     },
     mounted() {
-        axios.get("http://54.175.48.28/products/")
-        .then((res) => {
-            const dataSet = JSON.stringify(res.data.result)
-            localStorage.setItem("data", dataSet)
-        }).catch((err) => {
-            console.log(err)
-            this.$router.push({ path: "/" })
-        });
+        axios({
+                method : "get",
+                url : process.env.VUE_APP_URL + "product",
+                headers : {
+                    "Content-type" : "application/json",
+                    authtoken: localStorage.getItem("access_token"),
+                },
+            })
+            .then((res) => {
+                const dataSet = JSON.stringify(res.data.result)
+                localStorage.setItem("data", dataSet)
+            }).catch((err) => {
+                console.log(err)
+            });
     },
 }
 </script>
@@ -643,7 +669,7 @@ export default {
         background-color: rgb(212, 255, 195);
         cursor: pointer;
     }
-    .x {
+    .x, .xSmall {
         width: 20px;
         height: 20px;
         font-size: 16px;
@@ -653,6 +679,11 @@ export default {
         cursor: pointer;
         margin-top: 5px;
         background-color: rgb(222, 75, 81);
+    }
+    .xSmall {
+        position: absolute;
+        margin-top: 0;
+        top: 0;
     }
 
     .overlayImg {

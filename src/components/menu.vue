@@ -11,32 +11,37 @@
                         </a>
                     </li>
                     <li>
-                        <router-link to="/">
+                        <router-link to="/" v-if="dataRole == 'admin'">
                             <div class="img">
                                 <img src="../assets/fork.png" alt="Fork">
                             </div>
                         </router-link>
                     </li>
                     <li>
-                        <router-link to="/history">
+                        <router-link to="/history" v-if="dataRole == 'admin'">
                             <div class="img">
                                 <img src="../assets/clipboard.png" alt="Clipboard">
                             </div>
                         </router-link>
                     </li>
                     <li>
-                        <div class="img" @click="showAdd()">
+                        <div class="img" v-if="dataRole == 'admin'" @click="showAdd()">
                             <img src="../assets/add.png" alt="Add">
                         </div>
                     </li>
                     <li>
-                        <div class="img" @click="showUpdate()">
+                        <div class="img" v-if="dataRole == 'admin'" @click="showUpdate()">
                             <img src="../assets/edit.png" alt="Add">
                         </div>
                     </li>
                     <li>
-                        <div class="img" @click="showDelete()">
+                        <div class="img" v-if="dataRole == 'admin'" @click="showDelete()">
                             <img src="../assets/delete.png" alt="Add">
+                        </div>
+                    </li>
+                    <li>
+                        <div class="img" @click="logout()">
+                            <img src="../assets/logout.png" alt="Logout">
                         </div>
                     </li>
                 </ul>
@@ -49,20 +54,23 @@
                     <label for="name">Name</label>
                     <input
                         type="text"
+                        name="name"
                         id="name"
                         v-model="form.name_product"
                         required
                     ><br>
                     <label for="image">Image</label>
                     <input
-                        type="text"
-                        id="image"
-                        v-model="form.image_product"
+                        type="file"
+                        name="image"
+                        id="file"
+                        ref="file"
                         required
                     ><br>
                     <label for="price">Price</label>
                     <input
                         type="number"
+                        name="price"
                         id="price"
                         v-model="form.price_product"
                         required
@@ -75,7 +83,7 @@
                     </select>
                     <div class="btn">
                         <button class="checkout" @click="hideAdd()">Cancel</button>
-                        <button class="cancel" @click="addData()">Add</button>
+                        <button class="cancel" @click="addData(form)">Add</button>
                     </div>
                 </div>
             </div>
@@ -107,40 +115,44 @@
                     <label for="name">Old Name</label>
                     <input
                         type="text"
+                        name="oldName"
                         id="oldName"
-                        v-model="formup.old_name_product"
+                        v-model="formUpdate.old_name_product"
                         required
                     ><br>
                     <label for="name">Name</label>
                     <input
                         type="text"
-                        id="nameUp"
-                        v-model="formup.name_product"
+                        name="nameUpdate"
+                        id="nameUpdate"
+                        v-model="formUpdate.name_product"
                         required
                     ><br>
                     <label for="image">Image</label>
                     <input
-                        type="text"
-                        id="imageUp"
-                        v-model="formup.image_product"
+                        type="file"
+                        name="imageUpdate"
+                        id="imageUpdate"
+                        ref="fileUpdate"
                         required
                     ><br>
                     <label for="price">Price</label>
                     <input
                         type="number"
-                        id="priceUp"
-                        v-model="formup.price_product"
+                        name="priceUpdate"
+                        id="priceUpdate"
+                        v-model="formUpdate.price_product"
                         required
                     ><br>
                     <label >Category</label>
-                    <select name="category" v-model="formup.id_category" required>
+                    <select name="categoryUpdate" v-model="formUpdate.id_category" required>
                         <option value="Category" disabled>Category</option>
                         <option value="1">Food</option>
                         <option value="2">Drink</option>
                     </select>
                     <div class="btn">
                         <button class="checkout" @click="hideUp()">Cancel</button>
-                        <button class="cancel" @click="updateData()">Update</button>
+                        <button class="cancel" @click="updateData(formUpdate)">Update</button>
                     </div>
                 </div>
             </div>
@@ -159,18 +171,17 @@ export default {
             showDel : false,
             showUp : false,
             updateSubmit: false,
+            dataRole : localStorage.getItem("access_role"),
             nameForDel : "",
             form : {
-                name_product : "",
-                image_product : "",
-                price_product : 0,
+                name_product : null,
+                price_product : null,
                 id_category : null,
             },
-            formup : {
-                old_name_product : "",
-                name_product : "",
-                image_product : "",
-                price_product : 0,
+            formUpdate : {
+                old_name_product : null,
+                name_product : null,
+                price_product : null,
                 id_category : null,
             },
         }
@@ -181,11 +192,9 @@ export default {
             this.show = true
         },
         showDelete() {
-            // this.$router.push({name : "home"}).catch((err) => {console.log(err)})
             this.showDel = true
         },
         showUpdate() {
-            // this.$router.push({name : "home"}).catch((err) => {console.log(err)})
             this.showUp = true
         },
         hideAdd() {
@@ -197,22 +206,48 @@ export default {
         hideUp() {
             this.showUp = false
         },
-        addData() {
-            let getData = {
-                name : this.form.name_product,
-                image : this.form.image_product,
-                price : this.form.price_product,
-                idCategory : this.form.id_category
+        logout() {
+            let check = confirm("Are you sure you want to loguot?")
+            if (check) {
+                localStorage.removeItem("access_token")
+                localStorage.removeItem("access_role")
+                this.$router.push({ path: "/login"})
+                location.reload()
             }
-            console.log(getData)
-            
-            axios({
-                method : "post",
-                url : process.env.VUE_APP_URL + "products",
+        },
+        addData(data) {
+            let formData = new FormData()
+            formData.append('name', data.name_product)
+            formData.append('price', data.price_product)
+            formData.append('image', this.$refs.file.files[0])
+            formData.append('idCategory', data.id_category)
+
+            axios
+            .post(`${process.env.VUE_APP_URL}product`, formData, {
                 headers : {
-                    "Content-type" : "application/json"
+                    "Content-type" : `multipart/form-data; boundary=${formData._boundary}`,
+                    authtoken: localStorage.getItem("access_token"),
                 },
-                data : getData
+            })
+            .then((res) => {
+                alert(res.data.description);
+                location.reload()
+                this.form.name_product=null
+                this.form.price_product=null
+                this.$refs.file.value=null
+                this.form.id_category=null
+            }).catch((err) => {
+                console.log(err)
+            });
+        },
+        delData() {
+            let name = this.nameForDel
+            axios({
+                method : "delete",
+                url : `${process.env.VUE_APP_URL}product/del?name=${name}`,
+                headers : {
+                    authtoken: localStorage.getItem("access_token"),
+                },
             })
             .then((res) => {
                 alert(res.data.description);
@@ -221,33 +256,20 @@ export default {
                 console.log(err)
             });
         },
-        delData() {
-            let name = this.nameForDel
-            axios.delete(`http://54.175.48.28/products/del?name=${name}`)
-                        .then((res) => {
-                            alert(res.data.description);
-                            location.reload()
-                        }).catch((err) => {
-                            console.log(err)
-                        });
-        },
-        updateData() {
-            let updateData = {
-                oldName : this.formup.old_name_product,
-                name : this.formup.name_product,
-                image : this.formup.image_product,
-                price : this.formup.price_product,
-                idCategory : this.formup.id_category
-            }
-            console.log(updateData)
-            
-            axios({
-                method : "put",
-                url : process.env.VUE_APP_URL + "products",
+        updateData(data) {
+            let formData = new FormData()
+            formData.append('oldName', data.old_name_product)
+            formData.append('name', data.name_product)
+            formData.append('price', data.price_product)
+            formData.append('image', this.$refs.fileUpdate.files[0])
+            formData.append('idCategory', data.id_category)
+
+            axios
+            .put(`${process.env.VUE_APP_URL}product`, formData, {
                 headers : {
-                    "Content-type" : "application/json"
+                    "Content-type" : `multipart/form-data; boundary=${formData._boundary}`,
+                    authtoken: localStorage.getItem("access_token"),
                 },
-                data : updateData
             })
             .then((res) => {
                 alert(res.data.description);
@@ -262,6 +284,14 @@ export default {
 </script>
 
 <style scope>
+    #file, #imageUpdate {
+        width: 69%;
+        box-shadow: none;
+        border: none;
+        padding-left: 0;
+        background-color: white;
+    }
+    
     .menu-bar {
         width: 60px;
         position: fixed;
@@ -269,6 +299,7 @@ export default {
         z-index: 4;
         height: 100%;
         background-color: aliceblue;
+        /* background-color: rgb(210, 232, 252); */
     }
     .container-menu {
         padding: 12px 12px 12px 14px;

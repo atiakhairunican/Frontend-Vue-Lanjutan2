@@ -146,7 +146,7 @@ import axios from 'axios'
             }
         },
         mounted() {
-            axios.get("http://54.175.48.28/histories/")
+            axios.get("http://localhost:9000/history")
             .then((res) => {
                 const dataSet = JSON.stringify(res.data.result)
                 localStorage.setItem("dataHistory", dataSet)
@@ -179,6 +179,7 @@ import axios from 'axios'
         right: 0;
         padding: 0 20px 0 80px;
         background-color: aliceblue;
+        /* background-color: rgb(210, 232, 252); */
     }
     .container-head h3 {
         font-size: 24px;
@@ -186,8 +187,8 @@ import axios from 'axios'
         color: black;
     }
     .container-main {
+        width: 100%;
         height: 100%;
-        background-color: aliceblue;
         left: 0;
         right: 0;
         padding: 60px 0 0 60px;
@@ -196,20 +197,23 @@ import axios from 'axios'
     .main {
         width: 100%;
         height: 100%;
-        padding: 20px;
+        padding: 2vw;
         box-shadow: inset .1vw .1vw .7vw 0 rgba(0, 0, 0, .1);
     }
     .income {
         width: 100%;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        justify-content: center;
     }
     .todaysIncome, .orders, .yearsIncome {
         width: 30%;
-        padding: 4vw;
-        min-height: 45%;
+        padding: 4vw 3vw;
         float: left;
         margin: 1vw;
         line-height: 2.2vw;
-        border-radius: 3%;
+        border-radius: 1vw;
         position: relative;
         font-size: 1.1vw;
         font-weight: bold;
@@ -233,7 +237,7 @@ import axios from 'axios'
         width: 100%;
     }
     .pic1, .pic2, .pic3 {
-        width: 29%;
+        width: 28%;
     }
     .pic1 {
         margin: -10vw 0 0 15.5vw;
@@ -249,10 +253,10 @@ import axios from 'axios'
     }
     .revenue {
         width: 94%;
-        margin: 4vw 1vw 1vw 1vw;
+        margin: 3vw 0 0 3%;
         box-shadow: .5vw .5vw .6vw .4vw rgba(0, 0, 0, .15);
         padding: 3vw;
-        background-color: #eaeaea;
+        /* background-color: #eaeaea; */
     }
     .revenue h1 {
         float: left;
@@ -260,20 +264,26 @@ import axios from 'axios'
     }
     .revenue button {
         float: right;
+        font-size: 1vw;
     }
     .revenue select {
         float: right;
         cursor: pointer;
+        width: 10%;
+        font-size: 1vw;
+        margin-top: -8px;
     }
     .inform {
-        width: 17%;
-        margin: auto;
+        width: 100%;
         font-size: .8vw;
         font-weight: bold;
+        justify-content: center;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
     }
-    .inform .this, .last {
+    .this, .last {
         display: inline-block;
-        /* float: left; */
         width: .8vw;
         height: .8vw;
         background-color: cyan;
@@ -282,22 +292,18 @@ import axios from 'axios'
     .inform span {
         margin: .4vw .4vw 0 0;
     }
-    .inform p {
-        float: left;
-    }
     .inform .thisP {
         margin-right: 2vw;
     }
     .inform .last {
         background-color: lightpink;
     }
-    #month {
-        font-size: 12px;
-        width: 100px;
-    }
+    /* #month {
+        font-size: 1vw;
+        width: fit-content;
+    } */
     .diagram {
         width: 100%;
-        background-color: red;
         position: relative;
     }
     .diagram img {
@@ -308,7 +314,7 @@ import axios from 'axios'
         color: #ccc;
         font-weight: bold;
         float: left;
-        font-size: 14px;
+        font-size: 1vw;
     }
     hr {
         border: 0;
@@ -337,5 +343,28 @@ import axios from 'axios'
         color: #ccc;
         font-weight: 500;
         margin-top: -15vw;
+    }
+
+    @media (max-width: 900px) {
+        .pic1 {
+            margin: -9vw 0 0 14vw;
+        }
+        .pic2 {
+            margin: -8vw 0 0 11.5vw;
+        }
+        .pic3 {
+            margin: -6.5vw 0 0 8vw;
+        }
+    }
+    @media (max-width: 500px) {
+        .pic1 {
+            margin: -9vw 0 0 13vw;
+        }
+        .pic2 {
+            margin: -8vw 0 0 10.5vw;
+        }
+        .pic3 {
+            margin: -6.5vw 0 0 7vw;
+        }
     }
 </style>
