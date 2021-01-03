@@ -146,7 +146,7 @@ import axios from 'axios'
             }
         },
         mounted() {
-            axios.get("http://localhost:9000/history")
+            axios.get(`${process.env.VUE_APP_URL}history`)
             .then((res) => {
                 const dataSet = JSON.stringify(res.data.result)
                 localStorage.setItem("dataHistory", dataSet)
