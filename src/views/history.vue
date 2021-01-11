@@ -96,12 +96,12 @@
                                         <th width="15%">AMOUNT</th>
                                     </tr>
                                 </thead>
-                                <tbody v-for="order in datas" :key="order.id">
+                                <tbody v-for="order in getHistory" :key="order.id">
                                     <tr>
                                         <td>#{{maketextnumber(3)}}</td>
                                         <td>{{order.cashier}}</td>
                                         <td>{{order.date}}</td>
-                                        <td>{{order.orders}}</td>
+                                        <td style="text-align: left;">{{order.orders}}</td>
                                         <td>Rp. {{order.amount}}</td>
                                     </tr>
                                 </tbody>
@@ -118,19 +118,15 @@
 
 <script>
 import Menu from '../components/menu'
-import axios from 'axios'
+import {mapGetters, mapActions} from 'vuex'
 
     export default {
         name : "history",
         components : {
             Menu,
         },
-        data() {
-            return {
-                datas : JSON.parse(localStorage.getItem("dataHistory"))
-            }
-        },
         methods: {
+            ...mapActions(["feching"]),
             maketextnumber(n) {
                 let randomtextnumber = ""
                 for (let r = ["A", "B", "C", "D", "E", "F", "G", "H", "I",  "J", "K", "L",
@@ -145,16 +141,12 @@ import axios from 'axios'
                 return randomtextnumber
             }
         },
+        computed : {
+            ...mapGetters(["getHistory"]),
+        },
         mounted() {
-            axios.get(`${process.env.VUE_APP_URL}history`)
-            .then((res) => {
-                const dataSet = JSON.stringify(res.data.result)
-                localStorage.setItem("dataHistory", dataSet)
-            }).catch((err) => {
-                console.log(err)
-                this.$router.push({ path: "/" })
-            });
-    },
+            this.feching()
+        },
     }
 </script>
 
@@ -165,7 +157,9 @@ import axios from 'axios'
     }
     th {
         padding: 5px;
-        background-color: rgb(39, 223, 225);
+        color: black;
+        /* background-color: rgb(39, 223, 225); */
+        background-color:  rgb(66, 175, 243);
     }
     td {
         padding: 3px 10px;
@@ -178,27 +172,29 @@ import axios from 'axios'
         z-index: 3;
         right: 0;
         padding: 0 20px 0 80px;
-        background-color: aliceblue;
-        /* background-color: rgb(210, 232, 252); */
+        /* background-color:#f8f8f8; */
+        background-color: rgb(19, 27, 38);
     }
     .container-head h3 {
         font-size: 24px;
         text-align: center;
-        color: black;
+        color: #efefef;
     }
     .container-main {
         width: 100%;
         height: 100%;
         left: 0;
         right: 0;
+        color: #bbb;
         padding: 60px 0 0 60px;
         position: relative;
+        background-color: rgb(25, 34, 49);
     }
     .main {
         width: 100%;
         height: 100%;
         padding: 2vw;
-        box-shadow: inset .1vw .1vw .7vw 0 rgba(0, 0, 0, .1);
+        box-shadow: inset .1vw .1vw .7vw 0 rgba(255, 255, 255, .1);
     }
     .income {
         width: 100%;
@@ -254,9 +250,9 @@ import axios from 'axios'
     .revenue {
         width: 94%;
         margin: 3vw 0 0 3%;
-        box-shadow: .5vw .5vw .6vw .4vw rgba(0, 0, 0, .15);
+        box-shadow: .5vw .5vw .6vw .4vw rgba(255, 255, 255, .15);
         padding: 3vw;
-        /* background-color: #eaeaea; */
+        background-color: rgb(34, 51, 77);
     }
     .revenue h1 {
         float: left;

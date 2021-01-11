@@ -36,23 +36,24 @@
                     <h2 style="float: left; font-size: 22px">Checkout</h2>
                     <h4 style="float: right; font-size: 14px">Receipt no: #010410919</h4>
                     <div class="clear"></div>
-                    <p style="margin-bottom: 20px; font-size: 13px">Cashier : {{form.cashier}}</p>
-                    <ul v-for="list in chart" :key="list.id_product">
-                        <li>{{list.name_product}} {{count}}x</li>
+                    <p style="margin-bottom: 15px; font-size: 13px">Cashier : {{form.cashier}}</p>
+                    <div class="listscroll">
+                        <ul v-for="list in chart" :key="list.product.id_product">
+                            <li>{{list.product.name_product}} {{list.count}}x</li>
+                            <div class="right">
+                                <span class="rp">Rp. </span>
+                                <span class="res">{{list.product.price_product * list.count}}</span>
+                            </div>
+                            <div class="clear"></div>
+                        </ul>
+                        <p style="float: left; font-size: 14px">Ppn 10%</p>
                         <div class="right">
                             <span class="rp">Rp. </span>
-                            <span class="res">{{list.price_product * count}}</span>
+                            <span class="res">{{ppn}}</span>
                         </div>
                         <div class="clear"></div>
-                    </ul>
-                    <p style="float: left; font-size: 14px">Ppn 10%</p>
-                    <div class="right">
-                        <span class="rp">Rp. </span>
-                        <span class="res">{{ppn}}</span>
                     </div>
-                    <div class="clear"></div>
-                    
-                    <div class="payment" style="bottom: 70px">
+                    <div class="payment" style="position: relative;">
                         <p style="float: left; margin-top: 20px; font-size: 14px">Total :</p>
                         <div class="right" style="margin-top: 20px">
                             <div>
@@ -63,8 +64,8 @@
                         <div class="clear"></div>
 
                         <p style="margin-bottom: 20px; font-size: 14px">Payment : Cash</p>
-                        <button class="checkout" @click="clear()">Print</button>
-                        <p style="text-align: center; margin: -15px 0 -5px 0">Or</p>
+                        <button class="checkout" @click="showPop = false">Cancel</button>
+                        <p style="text-align: center; margin: -15px 0 -5px 0; font-size: 12px">Or</p>
                         <button class="cancel" @click="history()">Send Email</button>
                     </div>
 
@@ -73,7 +74,7 @@
 
 <!-- -------------------------------------------Cart in layout small------------------------------------------- -->
             <div class="overlayImg" @click="showUpCart()">
-                <p>{{chart.length * count}}</p>
+                <p>{{quantity}}</p>
                 <div class="img">
                     <img src="../assets/cart.png" alt="Cart">
                 </div>
@@ -81,7 +82,7 @@
             <div class="container-overlayside" v-show="showCart">
                 <aside class="overlayside">
                     <div class="xSmall" @click="showDownCart()">x</div>
-                    <h3>Cart <span>{{chart.length * count}}</span></h3>
+                    <h3>Cart <span>{{quantity}}</span></h3>
                     <div class="container-sidebar" v-show="show || chart.length == 0">
                         <div class="img">
                             <img src="../assets/food-and-restaurant.png" alt="Icon">
@@ -91,21 +92,21 @@
                     </div>
                     <div v-if="chart.length > 0" class="pay" v-show="!show">
                         <div class="container-thumb">
-                            <div v-for="thumb in chart" :key="thumb.id_product">
+                            <div v-for="(thumb, index) in chart" :key="thumb.product.id_product">
                                 <div>
                                     <Thumb
-                                        :images = "thumb.image_product"
-                                        :name = "thumb.name_product"
-                                        :price = "Number(thumb.price_product) * count"
+                                        :images = "thumb.product.image_product"
+                                        :name = "thumb.product.name_product"
+                                        :price = "Number(thumb.product.price_product) * thumb.count"
                                     />
                                 </div>
                                 <div class="addThumb">
-                                    <p class="minus" @click = "minusProd">-</p>
-                                    <p class="count">{{ count }}</p>
-                                    <p class="plus" @click = "plusProd">+</p>
+                                    <p class="minus" @click = "minusProd(index)">-</p>
+                                    <p class="count">{{ thumb.count }}</p>
+                                    <p class="plus" @click = "plusProd(index)">+</p>
+                                    <div v-if="chart.length > 0" class="x" @click = "deleteChart(index)">x</div>
                                 </div>
                             </div>
-                            <div v-if="chart.length > 0" class="x" @click = "delChart()">x</div>
                         </div>
                         <div class="payment">
                             <div style="width: 275px">
@@ -123,7 +124,7 @@
             
 <!-- -------------------------------------------Cart in layout large------------------------------------------- -->
             <aside class="sidebar">
-                <h3>Cart <span>{{chart.length * count}}</span></h3>
+                <h3>Cart <span>{{quantity}}</span></h3>
                 <div class="container-sidebar" v-show="show || chart.length == 0">
                     <div class="img">
                         <img src="../assets/food-and-restaurant.png" alt="Icon">
@@ -133,21 +134,21 @@
                 </div>
                 <div v-if="chart.length > 0" class="pay" v-show="!show">
                     <div class="container-thumb">
-                        <div v-for="thumb in chart" :key="thumb.id_product">
+                        <div v-for="(thumb, index) in chart" :key="thumb.product.id_product">
                             <div>
                                 <Thumb
-                                    :images = "thumb.image_product"
-                                    :name = "thumb.name_product"
-                                    :price = "Number(thumb.price_product) * count"
+                                    :images = "thumb.product.image_product"
+                                    :name = "thumb.product.name_product"
+                                    :price = "Number(thumb.product.price_product) * thumb.count"
                                 />
                             </div>
                             <div class="addThumb">
-                                <p class="minus" @click = "minusProd">-</p>
-                                <p class="count">{{ count }}</p>
-                                <p class="plus" @click = "plusProd">+</p>
+                                <p class="minus" @click = "minusProd(index)">-</p>
+                                <p class="count">{{ thumb.count }}</p>
+                                <p class="plus" @click = "plusProd(index)">+</p>
+                                <div v-if="chart.length > 0" class="x" @click = "deleteChart(index)">x</div>
                             </div>
                         </div>
-                        <div v-if="chart.length > 0" class="x" @click = "delChart()">x</div>
                     </div>
                     <div class="payment">
                         <div style="width: 275px">
@@ -166,17 +167,18 @@
             <section>
                 <div class="container-main">
                     <div class="main">
-                        <div class="loop" v-for="card in datas" :key="card.id_product">
+                        <div class="loop" v-for="card in getProd" :key="card.id_product">
                             <div class="if" 
                             v-if="String(card.name_product).toLowerCase().includes(getSearch) 
-                            || Number(getSearch) >= card.price_product" 
-                            @click="addChart(card)"
+                            || Number(getSearch) >= card.price_product"
                             >
                             <div class="card">
                                 <Card
                                     :images = "card.image_product"
                                     :name = "card.name_product"
                                     :price = "Number(card.price_product)"
+                                    :Data = "card"
+                                    @addProd = "add"
                                 />
                             </div>
                             </div>
@@ -193,6 +195,7 @@ import Card from '../components/card'
 import Menu from '../components/menu'
 import Thumb from '../components/thumb'
 import axios from 'axios'
+import {mapGetters, mapActions} from 'vuex'
 
 export default {
     name : "product",
@@ -203,8 +206,7 @@ export default {
     },
     data() {
         return {
-            datas : JSON.parse(localStorage.getItem("data")),
-            dataRole : localStorage.getItem("access_role"),
+            CoffeeShop : JSON.parse(localStorage.getItem('CoffeShop')),
             getSearch : "",
             chart : [],
             show : true,
@@ -222,6 +224,7 @@ export default {
         }
     },
     methods : {
+        ...mapActions(["faching", "sortName", "sortPrice", "sortCategory"]),
         history() {
             this.form.cashier = "#atiacan"
             let date = new Date()
@@ -230,9 +233,9 @@ export default {
             this.form.date = date.getDate() + " " + months[date.getMonth()] + " " + date.getFullYear()
             let order = []
             this.chart.forEach((value) => {
-                order.push(value.name_product);
+                order.push(value.product.name_product);
             });
-
+            
             this.form.orders = order.join(", ").toString()
             this.form.amount = this.amounted
             
@@ -259,82 +262,36 @@ export default {
                 console.log(err)
             });
         },
-        sortName() {
-            this.sorby = "Name"
-            axios({
-                method : "get",
-                url : `${process.env.VUE_APP_URL}product/search/ordered?orderBy=name_product&order=ASC`,
-                headers : {
-                    authtoken: localStorage.getItem("access_token"),
-                },
-            })
-            .then((res) => {
-                this.datas = res.data.result;
-            }).catch((err) => {
-                console.log(err)
-            });
-        },
-        sortPrice() {
-            this.sorby = "Price"
-            axios({
-                method : "get",
-                url : `${process.env.VUE_APP_URL}product/search/ordered?orderBy=price_product&order=ASC`,
-                headers : {
-                    authtoken: localStorage.getItem("access_token"),
-                },
-            })
-            .then((res) => {
-                this.datas = res.data.result;
-            }).catch((err) => {
-                console.log(err)
-            });
-        },
-        sortCategory() {
-            this.sorby = "Category"
-            axios({
-                method : "get",
-                url : `${process.env.VUE_APP_URL}product/search/ordered?orderBy=id_category&order=ASC`,
-                headers : {
-                    authtoken: localStorage.getItem("access_token"),
-                },
-            })
-            .then((res) => {
-                this.datas = res.data.result;
-            }).catch((err) => {
-                console.log(err)
-            });
-        },
-        addChart(value) {
-            let hasil = this.chart.find((res) => {
-            if (res.name_product == value.name_product) {
-                return res.name_product;
+        add(prod) {
+            let indexItem
+            let isExist = this.chart.filter((item, index) => {
+                if(item.product.id_product == Number(prod.id_product)) {
+                    indexItem = index
+                    return true
                 }
-            });
-            if (hasil) {
-                for (let i = 0; i < this.chart.length; i++) {
-                    if (this.chart[i].name_product == value.name_product) {
-                        this.chart[i].count++;
-                    }
+                else {
+                    return false
                 }
-            } else {
-                value.count = 1;
-                this.show = false
-                this.showOverlay = false
-                if (this.chart.length <= 6) {
-                    this.chart.push(value);
-                }
-            }
-        },
-        minusProd() {
-            if (this.count > 1) {
-                this.count = this.count - 1
+            })
+            if (isExist.length) {
+                this.chart[indexItem].count++
             }
             else {
-                this.count = 1
+                this.show = false
+                this.showOverlay = false
+                this.chart.push({product: prod, count: 1})
             }
         },
-        plusProd() {
-            this.count = this.count + 1
+        minusProd(idx) {
+            if (this.chart[idx].count > 1) {
+                this.chart[idx].count--
+            }
+            else {
+                this.chart[idx].splice(idx, 1)
+            }
+        },
+        plusProd(idx) {
+            this.chart[idx].count++
         },
         showPopup() {
             this.showPop = true
@@ -343,8 +300,8 @@ export default {
         hidePopup() {
             this.showPop = true
         },
-        delChart() {
-            this.chart.pop()
+        deleteChart(idx) {
+            this.chart.splice(idx, 1)
         },
         clear() {
             this.chart = []
@@ -357,18 +314,22 @@ export default {
         showDownCart() {
             this.showCart = false
         }
-        // toDetail(data) {
-        //     // berpindah halaman + passing data
-        //     this.$router.push({ path: "/", params: { data: data } })
-        // },
     },
     computed : {
+        ...mapGetters(["getProd", "getForm"]),
         calculated() {
-            let counts = 0
-            for (const data of this.chart) {
-                counts += Number(data.price_product) * this.count
+            let price = 0
+            for (const key in this.chart) {
+                price += Number(this.chart[key].product.price_product) * this.chart[key].count
             }
-            return counts
+            return price
+        },
+        quantity() {
+            let count = 0
+            for (const key in this.chart) {
+                count += this.chart[key].count
+            }
+            return count
         },
         amounted() {
             let totalpayment = this.calculated + (this.calculated * (10/100))
@@ -380,20 +341,7 @@ export default {
         },
     },
     mounted() {
-        axios({
-                method : "get",
-                url : process.env.VUE_APP_URL + "product",
-                headers : {
-                    "Content-type" : "application/json",
-                    authtoken: localStorage.getItem("access_token"),
-                },
-            })
-            .then((res) => {
-                const dataSet = JSON.stringify(res.data.result)
-                localStorage.setItem("data", dataSet)
-            }).catch((err) => {
-                console.log(err)
-            });
+        this.faching()
     },
 }
 </script>
@@ -408,21 +356,21 @@ export default {
         z-index: 3;
         right: 0;
         padding: 0 330px 0 80px;
-        background-color: rgb(222, 75, 81);
+        background-color: #f8f8f8;
     }
     .container-head h3 {
         float: left;
         font-size: 24px;
         text-align: center;
-        background-color: rgb(222, 75, 81);
-        color: aliceblue;
+        background-color: #f8f8f8;
+        color: #aaa;
         margin-left: 0;
         margin-right: 0;
     }
     .search {
         line-height: 60px;
         justify-content: center;
-        background-color: rgb(222, 75, 81);
+        background-color: #f8f8f8;
         width: 250px;
         float: right;
     }
@@ -433,7 +381,6 @@ export default {
         border: none;
         border-bottom: 1px solid #ddd;
         color: #333;
-        background-color: aliceblue;
         margin-top: 18px;
         font-size: 14px;
         padding: 0 16px;
@@ -456,7 +403,7 @@ export default {
 	}
 	.menu-malasngoding li a {
 		display: inline-block;
-		color: white;
+        color: #333;
 		text-align: center;
         width: 85px;
 		text-decoration: none;
@@ -497,11 +444,11 @@ export default {
         z-index: 6;
     }
     .popup {
-        width: 410px;
+        width: 350px;
         background-color: white;
         margin: auto;
-        height: 580px;
-        margin-top: 40px;
+        height: 500px;
+        margin-top: 80px;
         padding: 25px;
         border-radius: 10px;
         background-color: white;
@@ -535,13 +482,17 @@ export default {
         background-color: rgb(66, 175, 243);
     }
     button {
-        width: 350px;
+        width: 295px;
         padding: 8px;
         border: none;
         margin-bottom: 10px;
         border-radius: 5px;
         color: white;
         font-size: 14px;
+    }
+    .listscroll {
+        height: 180px;
+        overflow: auto;
     }
 
 /* ---------------------------------------------------Main--------------------------------------------------- */
@@ -554,7 +505,6 @@ export default {
         position: relative;
     }
     .main {
-        width: 100%;
         height: 100%;
         padding-top: 10px;
         display: flex;
@@ -574,7 +524,7 @@ export default {
         top: 0;
         position: fixed;
         height: 100%;
-        background-color: aliceblue;
+        background-color:#f8f8f8;
         box-shadow: 0 .1vw .5vw 0 rgba(0, 0, 0, .1);
     }
     .sidebar h3, .sidebar h4, .sidebar .img, .overlayside h3, .overlayside h4, .overlayside .img {
@@ -585,7 +535,7 @@ export default {
         font-size: 24px;
         text-align: center;
         line-height: 60px;
-        background-color: aliceblue;
+        background-color:#f8f8f8;
         border-bottom: 2px solid rgba(0, 0, 0, .1);
     }
     .sidebar h4, .overlayside h4 {
@@ -642,6 +592,11 @@ export default {
     .checkout {
         background-color: rgb(66, 175, 243);
     }
+    .container-thumb {
+        width: 100%;
+        height: 450px;
+        overflow: auto;
+    }
     .payment {
         position: absolute;
         bottom: 10px;
@@ -677,13 +632,14 @@ export default {
         text-align: center;
         line-height: 20px;
         cursor: pointer;
-        margin-top: 5px;
+        margin-left: 5px;
         background-color: rgb(222, 75, 81);
     }
     .xSmall {
         position: absolute;
         margin-top: 0;
         top: 0;
+        margin-left: 0;
     }
 
     .overlayImg {

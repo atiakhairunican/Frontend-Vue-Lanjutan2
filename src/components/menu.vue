@@ -1,6 +1,6 @@
 <template>
     <div class="container-fluit">
-		<aside class="menu-bar">
+		<aside class="menu-bar" v-show="!showMenu">
             <div class="container-menu">
                 <ul>
                     <li>
@@ -11,31 +11,31 @@
                         </a>
                     </li>
                     <li>
-                        <router-link to="/" v-if="dataRole == 'admin'">
+                        <router-link to="/" v-if="CoffeeShop.Login.users.role == 'admin'">
                             <div class="img">
                                 <img src="../assets/fork.png" alt="Fork">
                             </div>
                         </router-link>
                     </li>
                     <li>
-                        <router-link to="/history" v-if="dataRole == 'admin'">
+                        <router-link to="/history" v-if="CoffeeShop.Login.users.role == 'admin'">
                             <div class="img">
                                 <img src="../assets/clipboard.png" alt="Clipboard">
                             </div>
                         </router-link>
                     </li>
                     <li>
-                        <div class="img" v-if="dataRole == 'admin'" @click="showAdd()">
+                        <div class="img" v-if="CoffeeShop.Login.users.role == 'admin'" @click="showAdd()">
                             <img src="../assets/add.png" alt="Add">
                         </div>
                     </li>
                     <li>
-                        <div class="img" v-if="dataRole == 'admin'" @click="showUpdate()">
+                        <div class="img" v-if="CoffeeShop.Login.users.role == 'admin'" @click="showUpdate()">
                             <img src="../assets/edit.png" alt="Add">
                         </div>
                     </li>
                     <li>
-                        <div class="img" v-if="dataRole == 'admin'" @click="showDelete()">
+                        <div class="img" v-if="CoffeeShop.Login.users.role == 'admin'" @click="showDelete()">
                             <img src="../assets/delete.png" alt="Add">
                         </div>
                     </li>
@@ -170,8 +170,9 @@ export default {
             show : false,
             showDel : false,
             showUp : false,
-            updateSubmit: false,
-            dataRole : localStorage.getItem("access_role"),
+            showMenu : false,
+            updateSubmit : false,
+            CoffeeShop : JSON.parse(localStorage.getItem('CoffeShop')),
             nameForDel : "",
             form : {
                 name_product : null,
@@ -188,7 +189,6 @@ export default {
     },
     methods : {
         showAdd() {
-            // this.$router.push({name : "home"}).catch((err) => {console.log(err)})
             this.show = true
         },
         showDelete() {
@@ -207,13 +207,14 @@ export default {
             this.showUp = false
         },
         logout() {
-            let check = confirm("Are you sure you want to loguot?")
-            if (check) {
-                localStorage.removeItem("access_token")
-                localStorage.removeItem("access_role")
-                this.$router.push({ path: "/login"})
-                location.reload()
-            }
+            this.$store.dispatch("logout")
+                .then(() => {
+                    this.$router.push({ path: "/login"}).catch((err) => {err})
+                    location.reload()
+                })
+                .catch((err) => {
+                    console.log(err);
+                })
         },
         addData(data) {
             let formData = new FormData()
@@ -226,7 +227,7 @@ export default {
             .post(`${process.env.VUE_APP_URL}product`, formData, {
                 headers : {
                     "Content-type" : `multipart/form-data; boundary=${formData._boundary}`,
-                    authtoken: localStorage.getItem("access_token"),
+                    authtoken: this.CoffeeShop.Login.users.token,
                 },
             })
             .then((res) => {
@@ -246,7 +247,7 @@ export default {
                 method : "delete",
                 url : `${process.env.VUE_APP_URL}product/del?name=${name}`,
                 headers : {
-                    authtoken: localStorage.getItem("access_token"),
+                    authtoken: this.CoffeeShop.Login.users.token,
                 },
             })
             .then((res) => {
@@ -268,7 +269,7 @@ export default {
             .put(`${process.env.VUE_APP_URL}product`, formData, {
                 headers : {
                     "Content-type" : `multipart/form-data; boundary=${formData._boundary}`,
-                    authtoken: localStorage.getItem("access_token"),
+                    authtoken: this.CoffeeShop.Login.users.token,
                 },
             })
             .then((res) => {
@@ -278,7 +279,7 @@ export default {
                 console.log(err)
             });
         },
-    }
+    },
 }
 
 </script>
@@ -298,8 +299,8 @@ export default {
         top: 0;
         z-index: 4;
         height: 100%;
-        background-color: aliceblue;
-        /* background-color: rgb(210, 232, 252); */
+        background-color:#f8f8f8;
+        /* background-color: rgb(19, 27, 38); */
     }
     .container-menu {
         padding: 12px 12px 12px 14px;
@@ -368,7 +369,6 @@ export default {
         margin-right: 10px;
         border: none;
         padding: 7px;
-        /* margin-bottom: .5vw; */
         border-radius: 5px;
         color: white;
     }

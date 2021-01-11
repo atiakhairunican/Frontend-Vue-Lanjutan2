@@ -7,11 +7,6 @@
                 </div>
                 <div class="content">
                     <p class="name">{{ name }}</p>
-                    <!-- <div class="addThumb">
-                        <p class="minus" @click = "minusProd">-</p>
-                        <p class="count">{{ count }}</p>
-                        <p class="plus" @click = "plusProd">+</p>
-                    </div> -->
                 </div>
                 <p class="price">Rp. {{ price }}</p>
             </div>
@@ -41,19 +36,6 @@ export default {
             count : 1
         }
     },
-    // methods : {
-    //     minusProd() {
-    //         if (this.count > 1) {
-    //             this.count = this.count - 1
-    //         }
-    //         else {
-    //             this.count = 1
-    //         }
-    //     },
-    //     plusProd() {
-    //         this.count = this.count + 1
-    //     },
-    // }
 }
 </script>
 
@@ -80,17 +62,11 @@ export default {
         font-weight: bolder;
         font-size: 12px;
     }
-    /* .addThumb {
-        display: flex;
-        flex-direction: row;
-        flex-wrap: nowrap;
-        text-align: center;
-        line-height: 20px;
-    } */
     .name {
         width: 120px;
         height: 16px;
         margin-bottom: 5px;
+        line-height: 14px;
         overflow: hidden;
     }
     .price {
@@ -99,14 +75,4 @@ export default {
         margin-top: 20px;
         margin-left: 10px;
     }
-    /* .minus, .count, .plus {
-        width: 20px;
-        height: 20px;
-        color: rgb(88, 248, 82);
-        border: 1px solid rgb(119, 255, 119);
-    }
-    .minus, .plus {
-        background-color: rgb(212, 255, 195);
-        cursor: pointer;
-    } */
 </style>
