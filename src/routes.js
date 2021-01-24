@@ -20,7 +20,6 @@ const isAuth = (to, from, next) => {
 Vue.use(VueRouter)
 
 const mainRouter = new VueRouter({
-    mode : "history",
     routes : [
         {
             path : "/",
