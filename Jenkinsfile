@@ -7,8 +7,7 @@ pipeline {
 
     parameters {
         choice(
-            defaultValue: 'main'
-            choices: ['master', 'main'],
+            choices: ['prod', 'dev'],
             description: '',
             name: 'REQUESTED_ACTION'
         )
@@ -52,7 +51,7 @@ pipeline {
         stage("Production") {
             when {
                 expression {
-                    params.REQUESTED_ACTION == 'main'
+                    params.REQUESTED_ACTION == 'prod'
                 }
             }
             steps {
@@ -60,7 +59,7 @@ pipeline {
                     sshPublisher {
                         publishers: [
                             sshPublisherDesc {
-                                configName: 'devserver',
+                                configName: 'prodserver',
                                 verbose: true,
                                 transfers: [
                                     sshTransfer {
@@ -78,7 +77,7 @@ pipeline {
         stage("Deployment") {
             when {
                 expression {
-                    params.REQUESTED_ACTION == 'master'
+                    params.REQUESTED_ACTION == 'dev'
                 }
             }
             steps {
