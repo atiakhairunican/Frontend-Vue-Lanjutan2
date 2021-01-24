@@ -7,10 +7,13 @@ pipeline {
 
     parameters {
         choice(
-            choices: ['prod', 'dev'],
+            choices: ['dev', 'prod'],
             description: '',
-            name: 'REQUESTED_ACTION'
-        )
+            name: 'REQUESTED_ACTION')
+    }
+
+    environment {
+        compose_file = "docker-compose.yml"
     }
 
     stages {
@@ -25,7 +28,7 @@ pipeline {
         stage("Build docker") {
             steps {
                 script {
-                    builder = docker.build("${dockerhub}:${BRANCH_NAME}")
+                    builder = docker.build("${image_name}")
                 }
             }
         }
@@ -56,20 +59,20 @@ pipeline {
             }
             steps {
                 script {
-                    sshPublisher {
+                    sshPublisher(
                         publishers: [
-                            sshPublisherDesc {
-                                configName: 'prodserver',
+                            sshPublisherDesc(
+                                configName: "prodserver",
                                 verbose: true,
                                 transfers: [
-                                    sshTransfer {
-                                        execCommand: "docker rmi ${image_name}; docker pull ${image_name}; cd /home/production/production; docker-compose down; docker-compose up -d",
+                                    sshTransfer(
+                                        execCommand: "docker rmi ${image_name}; docker pull ${image_name}; docker-compose down; docker-compose up -d",
                                         execTimeout: 1500000
-                                    }
+                                    )
                                 ]
-                            }
+                            )
                         ]
-                    }
+                    )
                 }
             }
         }
@@ -82,20 +85,20 @@ pipeline {
             }
             steps {
                 script {
-                    sshPublisher {
+                    sshPublisher(
                         publishers: [
-                            sshPublisherDesc {
-                                configName: 'devserver',
+                            sshPublisherDesc(
+                                configName: "devserver",
                                 verbose: true,
                                 transfers: [
-                                    sshTransfer {
+                                    sshTransfer(
                                         execCommand: "docker rmi ${image_name}; docker pull ${image_name}; cd /home/production/production; docker-compose down; docker-compose up -d",
                                         execTimeout: 1500000
-                                    }
+                                    )
                                 ]
-                            }
+                            )
                         ]
-                    }
+                    )
                 }
             }
         }
