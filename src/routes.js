@@ -6,8 +6,6 @@ import Login from './views/login.vue'
 import PageNotFound from './views/page404.vue'
 import Store from './store/index'
 
-const CoffeeShop = JSON.parse(localStorage.getItem('CoffeShop'))
-
 const isAuth = (to, from, next) => {
     if (Store.getters["getIsAuth"] == true) {
         next()
@@ -25,14 +23,12 @@ const mainRouter = new VueRouter({
             path : "/",
             name : "home",
             component : Product,
-            // meta: { requiresAuth: true },
             beforeEnter : isAuth,
         },
         {
             path : "/history",
             name : "history",
             component : History,
-            // meta: { requiresAuth: true },
             beforeEnter : isAuth,
         },
         {
@@ -51,7 +47,7 @@ const mainRouter = new VueRouter({
 
 mainRouter.beforeEach((to, from, next) => {
     if (to.matched.some((record) => record.meta.requiresVisitor)) {
-        if (CoffeeShop.Login.users != null) {
+        if (Store.getters["getIsAuth"] == true) {
             next({path: "/"});
         }
         else {
