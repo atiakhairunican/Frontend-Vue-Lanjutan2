@@ -7,7 +7,7 @@ pipeline {
 
     parameters {
         choice(
-            choices: ['dev', 'prod'],
+            choices: ['prod', 'dev'],
             description: '',
             name: 'REQUESTED_ACTION')
     }
