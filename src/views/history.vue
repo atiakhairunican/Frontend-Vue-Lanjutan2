@@ -172,8 +172,8 @@ import {mapGetters, mapActions} from 'vuex'
         z-index: 3;
         right: 0;
         padding: 0 20px 0 80px;
-        /* background-color:#f8f8f8; */
-        background-color: rgb(19, 27, 38);
+        background-color:#f8f8f8;
+        /* background-color: rgb(19, 27, 38); */
     }
     .container-head h3 {
         font-size: 24px;
