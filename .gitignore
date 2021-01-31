@@ -2,6 +2,7 @@
 node_modules
 coba
 /dist
+docker-compose.yml
 
 
 # local env files
