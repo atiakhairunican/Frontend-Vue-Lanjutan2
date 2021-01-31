@@ -88,16 +88,6 @@ pipeline {
                     sshPublisher(
                         publishers: [
                             sshPublisherDesc(
-                                configName: "devserver",
-                                verbose: true,
-                                transfers: [
-                                    sshTransfer(
-                                        execCommand: "cd /home/develop/kubernetes; docker-compose down; docker-compose up -d",
-                                        execTimeout: 1500000
-                                    )
-                                ]
-                            ),
-                            sshPublisherDesc(
                                 configName: "kubeserver",
                                 verbose: true,
                                 transfers: [
