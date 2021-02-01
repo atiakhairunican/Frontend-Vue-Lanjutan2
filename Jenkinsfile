@@ -92,7 +92,7 @@ pipeline {
                                 verbose: true,
                                 transfers: [
                                     sshTransfer(
-                                        execCommand: "kubectl delete deployment.apps/frontend; kubectl delete service/frontend; kubectl apply -f frontend.yaml",
+                                        execCommand: "cd /root/k8s/kubernetes echo 'A12051999f' | sudo -S kubectl apply -f frontend.yaml",
                                         execTimeout: 1500000
                                     )
                                 ]
