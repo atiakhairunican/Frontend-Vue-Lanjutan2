@@ -92,7 +92,7 @@ pipeline {
                                 verbose: true,
                                 transfers: [
                                     sshTransfer(
-                                        execCommand: "cd /home/kubernetes/kubernetes echo 'A12051999f' | sudo -S kubectl apply -f frontend.yaml",
+                                        execCommand: "cd /home/kubernetes/kubernetes; echo 'A12051999f' | sudo -S kubectl apply -f frontend.yaml",
                                         execTimeout: 1500000
                                     )
                                 ]
